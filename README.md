@@ -46,7 +46,7 @@ Used to get a Refresh Token for a registered User.
 
 ```json
 {
-    "login": "[valid login]",
+    "user": "[valid login]",
     "password": "[password in plain text]"
 }
 ```
