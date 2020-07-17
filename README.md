@@ -42,6 +42,8 @@ Used to get a Refresh Token for a registered User.
 
 **Auth required** : Authorization Basic credentials is composed of APP client_id and client_secret base 64 encoded
 
+**Headers** : `Content-Type: application/json`
+
 **Data constraints**
 
 ```json
@@ -90,6 +92,8 @@ Used to get an Access Token from a Refresh Token.
 
 **Auth required** : No
 
+**Headers** : `Content-Type: application/x-www-form-urlencoded`
+
 **Data constraints**
 
 ```
@@ -135,6 +139,8 @@ Get all user's accounts.
 
 **Auth required** : Authorization header with Bearer token
 
+**Headers** : `Content-Type: application/json`
+
 #### Success Response
 
 **Code** : `200 OK`
@@ -172,6 +178,8 @@ Get an account's transactions, by account number
 **Method** : `GET`
 
 **Auth required** : Bearer token
+
+**Headers** : `Content-Type: application/json`
 
 #### Success Response
 
