@@ -1,4 +1,4 @@
-
+//si ca ne bouge pas  ==> const domain
 var domain = "bank.local.fr"
 
 /**
@@ -14,6 +14,8 @@ var domain = "bank.local.fr"
 async function fetchTransactions(fromDate, authorization, jws = null, id, page, previousTransactions) {
 	console.log(`--- Fetch Trasactions page n°${page} ---`);
 	try {
+    //headers plus générique n'ajouter que le jws si présent ca evite la duplication de code
+
     var headers = {"Authorisation":  authorization }
 
     if (jws) {
