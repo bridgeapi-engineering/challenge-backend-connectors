@@ -1,5 +1,5 @@
 
-var domain = "bank.local.fr"
+var domain = "bank.local.fr" 
 
 /**
  * @description Fetch transactions recursively
