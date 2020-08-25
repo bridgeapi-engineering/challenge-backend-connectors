@@ -14,7 +14,7 @@ async function fetchTransactions(fromDate, authorization, jws = null, id, page, 
 	console.log(`--- Fetch Transactions page n°${page} ---`);
 	
 	try {
-		let headers = {
+		const headers = {
 			"Authorisation": authorization,
 			"Content-type": "application/json",
 			"Accept": "application/json",
