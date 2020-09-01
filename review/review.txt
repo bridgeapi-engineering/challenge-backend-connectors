@@ -1,0 +1,32 @@
+Review : fileToReview.js
+
+L17 à 32 : redondant. Inutile de redéfinir entièrement headers à chaque fois. On pourrait le définir une bonne fois pour toute L17 puis ajouter le champ jws si il existe avec if(jws) headers.jws = jws; .
+
+L34 : La fonction doRequest (qui sert surement à faire une requête HTTP) n’est pas définie.
+L35 : Etrange d’utiliser deux formatages différents dans la même chaîne. On préférera utiliser soit les ‘ soit les `.
+
+L39 à 41 : Lourd de faire 3 boucles, on peut regrouper en une seule : if (code == 200 && response.data && response.data.meta && response.data.meta.hasPageSuivante) 
+Pas besoin non plus de faire if(response) car response est toujours définie donc vaut TRUE.
+Je pense aussi que ce n’est pas ici que l’on doit tester qu’une page suivante existe (response.data.meta.hasPageSuivante) car même si elle n’en as pas on doit quand même traiter les mouvements de cette page.
+
+L42 : On a aucune assurance de l’existence de response.data.Mouvements, on pourrait le rajouter comme condition dans la boucle précédente car cette ligne peut provoquer une erreur.
+L43 : On s’intéresse à la date du dernier mouvement. C’est à supposer que les mouvements sont classés par ordre de date, ce qui paraît intuitivement vrai mais n’est pas nécessairement le cas (il faudrait que j’en sache plus sur le fonctionnement de l’API pour savoir si c’est réellement le cas).
+
+L48: Condition fausse et inutile. La condition est « est ce que la variable mouvements existe ?» qui sera toujours TRUE. On veut plutôt tester si mouvements est non vide : if (mouvements.length).
+
+L49 : la fonction assertTransactions n’est pas définie.
+
+L57 : A mon avis, c’est plutôt ici que l’on doit tester qu’une page suivante existe car si ce n’est pas le cas inutile de rappeler la fonction fetchTransactions vu qu’on ne trouvera aucun mouvement.
+On peut remplacer (jws || nul) par jws car la variable est toujours définie (elle peut valoir null).
+
+L58 : Pas très recommandé en général de modifier directement la réponse de l’API. On préférera modifier la valeur de la variable mouvements.
+L62 : Ainsi, on va renvoyer mouvements et non response.data.Mouvements.
+
+L63 : Il serait préférable de définir l’erreur.
+
+L65 : Ne sera jamais lu.
+
+L69 : Par définition, statusCode est un nombre.
+L70 : e n’est pas définie, c’est err.
+ 
+Autre remarque : Confusion sur le type de ce qui doit être renvoyé, un Array ou un Object ? Selon la définition c’est un objet mais dans la fonction on renvoie toujours des tableaux.
