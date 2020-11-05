@@ -14,7 +14,7 @@ var domain = "bank.local.fr"
 async function fetchTransactions(fromDate, authorization, jws = null, id, page, previousTransactions) {
 	console.log(`--- Fetch Trasactions page n°${page} ---`);
 	try {
-    var headers = {"Authorisation":  authorization }
+    var headers = {"Authorisation":  authorization } //"var" devrait être "let" et le headers pourrait être initialisé vide {} car redéfini ensuite
 
     if (jws) {
       headers = {
@@ -30,6 +30,25 @@ async function fetchTransactions(fromDate, authorization, jws = null, id, page, 
         "Accept": "application/json",
       }
     }
+		
+	/*
+	Le bloc 19-32 peut être simplifié :
+	
+	if (jws) {
+      		headers = {
+			"Authorisation": authorization,
+			"jws": jws,
+			"Content-type": "application/json",
+			"Accept": "application/json"
+		}
+	} else {
+		headers = {
+			"Authorisation": authorization,
+			"Content-type": "application/json",
+			"Accept": "application/json",
+		}
+	}
+	*/
 
 	  var {code, response } = await doRequest('GET',
       domain + '/accounts/'+ id + '/transactions?' + `page=${page}`,
@@ -62,12 +81,12 @@ async function fetchTransactions(fromDate, authorization, jws = null, id, page, 
       return response.data.Mouvements;
     } else throw new Error();
 
-    return [];
+    return []; //Ce return n'est jamais atteint et donc superflu
 	} catch (err) {
 		throw new CustomError({
       function: 'fetchTransactions',
 			statusCode: 'CRASH',
-			rawError: e,
+			rawError: e, //Penser à définir e sinon utiliser err
 		});
 	}
 }
