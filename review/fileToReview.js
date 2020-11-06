@@ -47,7 +47,7 @@ async function fetchTransactions(
       if (response.data.meta) {
         if (response.data.meta.hasPageSuivante) {
           let mouvements = response.data.Mouvements;
-          var date = mouvements[mouvements.length - 1].dateValeur;
+          const date = mouvements[mouvements.length - 1].dateValeur;
           if (date <= fromDate) {
             console.log("FromDate is Reached - we don't need more transaction");
           } else {
