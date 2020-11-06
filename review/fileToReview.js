@@ -1,5 +1,4 @@
-
-var domain = "bank.local.fr"
+const domain = 'bank.local.fr';
 
 /**
  * @description Fetch transactions recursively
@@ -11,36 +10,44 @@ var domain = "bank.local.fr"
  * @param {Object} previousTransactions Previous page of transactions (To ckeck for dupes)
  * @return {Object} All transactions available on the page
  */
-async function fetchTransactions(fromDate, authorization, jws = null, id, page, previousTransactions) {
-	console.log(`--- Fetch Trasactions page n°${page} ---`);
-	try {
-    var headers = {"Authorisation":  authorization }
+async function fetchTransactions(
+  fromDate,
+  authorization,
+  jws = null,
+  id,
+  page,
+  previousTransactions
+) {
+  console.log(`--- Fetch Transactions page n°${page} ---`);
+  try {
+    let headers = { Authorization: authorization };
 
     if (jws) {
       headers = {
-        "Authorisation": authorization,
-        "jws": jws,
-        "Content-type": "application/json",
-        "Accept": "application/json"
-      }
+        Authorization: authorization,
+        jws: jws,
+        'Content-type': 'application/json',
+        Accept: 'application/json',
+      };
     } else {
       headers = {
-        "Authorisation": authorization,
-        "Content-type": "application/json",
-        "Accept": "application/json",
-      }
+        Authorization: authorization,
+        'Content-type': 'application/json',
+        Accept: 'application/json',
+      };
     }
 
-	  var {code, response } = await doRequest('GET',
-      domain + '/accounts/'+ id + '/transactions?' + `page=${page}`,
-      headers);
+    let { code, response } = await doRequest(
+      'GET',
+      domain + '/accounts/' + id + '/transactions?' + `page=${page}`,
+      headers
+    );
 
-
-		if (response && code == 200 && response.data) {
+    if (response && code == 200 && response.data) {
       if (response.data.meta) {
         if (response.data.meta.hasPageSuivante) {
           let mouvements = response.data.Mouvements;
-          var date = mouvements[mouvements.length -1].dateValeur;
+          var date = mouvements[mouvements.length - 1].dateValeur;
           if (date <= fromDate) {
             console.log("FromDate is Reached - we don't need more transaction");
           } else {
@@ -52,9 +59,19 @@ async function fetchTransactions(fromDate, authorization, jws = null, id, page, 
                 console.log(`Push transactions from page ${page}`);
               }
             } else {
-              throw new Error("Empty list of transactions ! " + JSON.stringify(previousTransactions));
+              throw new Error(
+                'Empty list of transactions ! ' +
+                  JSON.stringify(previousTransactions)
+              );
             }
-            let nextPagesTransactions = fetchTransactions(fromDate, authorization, (jws || null), id, page + 1, mouvements);
+            let nextPagesTransactions = fetchTransactions(
+              fromDate,
+              authorization,
+              jws || null,
+              id,
+              page + 1,
+              mouvements
+            );
             response.data.Mouvements = mouvements.concat(nextPagesTransactions);
           }
         }
@@ -63,11 +80,11 @@ async function fetchTransactions(fromDate, authorization, jws = null, id, page, 
     } else throw new Error();
 
     return [];
-	} catch (err) {
-		throw new CustomError({
+  } catch (err) {
+    throw new CustomError({
       function: 'fetchTransactions',
-			statusCode: 'CRASH',
-			rawError: e,
-		});
-	}
+      statusCode: 'CRASH',
+      rawError: err,
+    });
+  }
 }
