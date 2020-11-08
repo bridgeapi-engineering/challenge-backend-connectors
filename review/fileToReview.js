@@ -1,5 +1,5 @@
 
-var domain = "bank.local.fr"
+const domain = "bank.local.fr"
 
 /**
  * @description Fetch transactions recursively
@@ -11,36 +11,23 @@ var domain = "bank.local.fr"
  * @param {Object} previousTransactions Previous page of transactions (To ckeck for dupes)
  * @return {Object} All transactions available on the page
  */
-async function fetchTransactions(fromDate, authorization, jws = null, id, page, previousTransactions) {
+async function fetchTransactions(fromDate, authorization, id, page, previousTransactions, jws = null) {
 	console.log(`--- Fetch Trasactions page n°${page} ---`);
 	try {
-    var headers = {"Authorisation":  authorization }
+    const headers = getHeader(jws, authorization);
 
-    if (jws) {
-      headers = {
-        "Authorisation": authorization,
-        "jws": jws,
-        "Content-type": "application/json",
-        "Accept": "application/json"
-      }
-    } else {
-      headers = {
-        "Authorisation": authorization,
-        "Content-type": "application/json",
-        "Accept": "application/json",
-      }
-    }
-
-	  var {code, response } = await doRequest('GET',
-      domain + '/accounts/'+ id + '/transactions?' + `page=${page}`,
-      headers);
-
-
-		if (response && code == 200 && response.data) {
+	  let { code, response } = await doRequest(
+      'GET',
+      `${domain}/accounts/${id}/transactions?page=${page}`,
+      headers,
+    );
+    
+    const isValidResponse = response && code == 200 && response.data;
+		if (isValidResponse) {
       if (response.data.meta) {
         if (response.data.meta.hasPageSuivante) {
           let mouvements = response.data.Mouvements;
-          var date = mouvements[mouvements.length -1].dateValeur;
+          const date = mouvements[mouvements.length -1].dateValeur;
           if (date <= fromDate) {
             console.log("FromDate is Reached - we don't need more transaction");
           } else {
@@ -54,20 +41,40 @@ async function fetchTransactions(fromDate, authorization, jws = null, id, page, 
             } else {
               throw new Error("Empty list of transactions ! " + JSON.stringify(previousTransactions));
             }
-            let nextPagesTransactions = fetchTransactions(fromDate, authorization, (jws || null), id, page + 1, mouvements);
+            let nextPagesTransactions = fetchTransactions(
+              fromDate,
+              authorization,
+              (jws || null),
+              id,
+              page + 1,
+              mouvements,
+            );
             response.data.Mouvements = mouvements.concat(nextPagesTransactions);
           }
         }
       }
       return response.data.Mouvements;
-    } else throw new Error();
-
-    return [];
+    } 
+    else 
+      throw new Error();
 	} catch (err) {
 		throw new CustomError({
       function: 'fetchTransactions',
 			statusCode: 'CRASH',
-			rawError: e,
+			rawError: err,
 		});
 	}
+}
+
+
+function getHeader(jws, authorization) {
+  const headers = {
+    "Authorization": authorization,
+    "jws": jws,
+    "Content-type": "application/json",
+    "Accept": "application/json"
+  };
+  if (!jws) 
+    delete headers.jws; 
+  return headers;
 }
