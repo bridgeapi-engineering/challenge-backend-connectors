@@ -1,5 +1,5 @@
 
-var domain = "bank.local.fr"
+const domain = "bank.local.fr"
 
 /**
  * @description Fetch transactions recursively
@@ -12,58 +12,43 @@ var domain = "bank.local.fr"
  * @return {Object} All transactions available on the page
  */
 async function fetchTransactions(fromDate, authorization, jws = null, id, page, previousTransactions) {
-	console.log(`--- Fetch Trasactions page n°${page} ---`);
+	console.log(`--- Fetch Transactions page n°${page} ---`);
 	try {
-    var headers = {"Authorisation":  authorization }
+    let headers = { 
+      "Authorization":  authorization,
+      "Content-type": "application/json",
+      "Accept": "application/json",
+    };
 
-    if (jws) {
-      headers = {
-        "Authorisation": authorization,
-        "jws": jws,
-        "Content-type": "application/json",
-        "Accept": "application/json"
-      }
-    } else {
-      headers = {
-        "Authorisation": authorization,
-        "Content-type": "application/json",
-        "Accept": "application/json",
-      }
-    }
+    if (jws) headers["jws"] = jws;
 
-	  var {code, response } = await doRequest('GET',
-      domain + '/accounts/'+ id + '/transactions?' + `page=${page}`,
+    var { code, response } = await doRequest('GET',
+      `${domain}/accounts/${id}/transactions?page=${page}`,
       headers);
 
-
 		if (response && code == 200 && response.data) {
-      if (response.data.meta) {
-        if (response.data.meta.hasPageSuivante) {
-          let mouvements = response.data.Mouvements;
-          var date = mouvements[mouvements.length -1].dateValeur;
-          if (date <= fromDate) {
-            console.log("FromDate is Reached - we don't need more transaction");
-          } else {
-            // if we have mouvements
-            if (mouvements) {
-              if (assertTransactions(mouvements)) {
-                return [];
-              } else {
-                console.log(`Push transactions from page ${page}`);
-              }
+      if (response.data.meta && response.data.meta.hasPageSuivante) {
+        let mouvements = response.data.Mouvements;
+        if (mouvements[mouvements.length -1].dateValeur <= fromDate) {
+          console.log("FromDate is Reached - we don't need more transaction");
+        } else {
+          // if we have mouvements
+          if (mouvements) {
+            if (assertTransactions(mouvements)) {
+              return [];
             } else {
-              throw new Error("Empty list of transactions ! " + JSON.stringify(previousTransactions));
+              console.log(`Push transactions from page ${page}`);
             }
             let nextPagesTransactions = fetchTransactions(fromDate, authorization, (jws || null), id, page + 1, mouvements);
             response.data.Mouvements = mouvements.concat(nextPagesTransactions);
+          } else {
+            throw new Error("Empty list of transactions ! " + JSON.stringify(previousTransactions));
           }
         }
       }
       return response.data.Mouvements;
     } else throw new Error();
-
-    return [];
-	} catch (err) {
+	} catch (e) {
 		throw new CustomError({
       function: 'fetchTransactions',
 			statusCode: 'CRASH',
