@@ -1,4 +1,3 @@
-
 var domain = "bank.local.fr"
 
 /**
@@ -12,62 +11,62 @@ var domain = "bank.local.fr"
  * @return {Object} All transactions available on the page
  */
 async function fetchTransactions(fromDate, authorization, jws = null, id, page, previousTransactions) {
-	console.log(`--- Fetch Trasactions page n°${page} ---`);
-	try {
-    var headers = {"Authorisation":  authorization }
+    console.log(`--- Fetch Trasactions page n°${page} ---`);
+    try {
+        var headers = {"Authorisation": authorization}
 
-    if (jws) {
-      headers = {
-        "Authorisation": authorization,
-        "jws": jws,
-        "Content-type": "application/json",
-        "Accept": "application/json"
-      }
-    } else {
-      headers = {
-        "Authorisation": authorization,
-        "Content-type": "application/json",
-        "Accept": "application/json",
-      }
-    }
-
-	  var {code, response } = await doRequest('GET',
-      domain + '/accounts/'+ id + '/transactions?' + `page=${page}`,
-      headers);
-
-
-		if (response && code == 200 && response.data) {
-      if (response.data.meta) {
-        if (response.data.meta.hasPageSuivante) {
-          let mouvements = response.data.Mouvements;
-          var date = mouvements[mouvements.length -1].dateValeur;
-          if (date <= fromDate) {
-            console.log("FromDate is Reached - we don't need more transaction");
-          } else {
-            // if we have mouvements
-            if (mouvements) {
-              if (assertTransactions(mouvements)) {
-                return [];
-              } else {
-                console.log(`Push transactions from page ${page}`);
-              }
-            } else {
-              throw new Error("Empty list of transactions ! " + JSON.stringify(previousTransactions));
+        if (jws) {
+            headers = {
+                "Authorisation": authorization,
+                "jws": jws,
+                "Content-type": "application/json",
+                "Accept": "application/json"
             }
-            let nextPagesTransactions = fetchTransactions(fromDate, authorization, (jws || null), id, page + 1, mouvements);
-            response.data.Mouvements = mouvements.concat(nextPagesTransactions);
-          }
+        } else {
+            headers = {
+                "Authorisation": authorization,
+                "Content-type": "application/json",
+                "Accept": "application/json",
+            }
         }
-      }
-      return response.data.Mouvements;
-    } else throw new Error();
 
-    return [];
-	} catch (err) {
-		throw new CustomError({
-      function: 'fetchTransactions',
-			statusCode: 'CRASH',
-			rawError: e,
-		});
-	}
+        var {code, response} = await doRequest('GET',
+            domain + '/accounts/' + id + '/transactions?' + `page=${page}`,
+            headers);
+
+
+        if (response && code == 200 && response.data) {
+            if (response.data.meta) {
+                if (response.data.meta.hasPageSuivante) {
+                    let mouvements = response.data.Mouvements;
+                    var date = mouvements[mouvements.length - 1].dateValeur;
+                    if (date <= fromDate) {
+                        console.log("FromDate is Reached - we don't need more transaction");
+                    } else {
+                        // if we have mouvements
+                        if (mouvements) {
+                            if (assertTransactions(mouvements)) {
+                                return [];
+                            } else {
+                                console.log(`Push transactions from page ${page}`);
+                            }
+                        } else {
+                            throw new Error("Empty list of transactions ! " + JSON.stringify(previousTransactions));
+                        }
+                        let nextPagesTransactions = fetchTransactions(fromDate, authorization, (jws || null), id, page + 1, mouvements);
+                        response.data.Mouvements = mouvements.concat(nextPagesTransactions);
+                    }
+                }
+            }
+            return response.data.Mouvements;
+        } else throw new Error();
+
+        return [];
+    } catch (err) {
+        throw new CustomError({
+            function: 'fetchTransactions',
+            statusCode: 'CRASH',
+            rawError: e,
+        });
+    }
 }
