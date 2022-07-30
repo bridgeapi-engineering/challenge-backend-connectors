@@ -31,4 +31,14 @@ const getAccounts = async () => {
     return res.data.account;
 }
 
-getAccounts().then(account => console.log(account)).catch(error => console.log(error.message))
+const getTransactions = async (account) => {
+    const accessToken = await getAccessToken();
+    const config = {headers: {'Authorization': 'Bearer ' + accessToken}};
+
+    const res = await axios.get('http://localhost:3000/accounts/'+ account +'/transactions', config);
+    console.log(`statusCode Transactions for Account ${account}: ${res.status}`);
+    return res.data.transactions;
+}
+
+
+getTransactions("000000001").then(account => console.log(account)).catch(error => console.log(error.message))
