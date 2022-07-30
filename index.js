@@ -31,7 +31,7 @@ const getAccounts = async () => {
     return res.data.account;
 }
 
-const getTransactions = async (account) => {
+const getTransactionsForAnAccount = async (account) => {
     const accessToken = await getAccessToken();
     const config = {headers: {'Authorization': 'Bearer ' + accessToken}};
 
@@ -40,5 +40,13 @@ const getTransactions = async (account) => {
     return res.data.transactions;
 }
 
+const getTransactions = async () => {
+    const accounts = await getAccounts();
+    for (const account of accounts) {
+        account.transactions = await getTransactionsForAnAccount(account.acc_number);
+    }
+    return accounts;
+}
 
-getTransactions("000000001").then(account => console.log(account)).catch(error => console.log(error.message))
+
+getTransactions().then(account => console.log(JSON.stringify(account))).catch(error => console.log(error.message));
