@@ -9,7 +9,7 @@
   "scripts": {
     "postinstall": "cd test && npm install",
     "start": "node solution/app.js",
-    "test": "node test"
+    "test": "node test/server/server.js"
   },
   "repository": {
     "type": "git",
