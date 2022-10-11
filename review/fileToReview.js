@@ -71,3 +71,5 @@ async function fetchTransactions(fromDate, authorization, jws = null, id, page, 
 		});
 	}
 }
+
+//REVIEW
