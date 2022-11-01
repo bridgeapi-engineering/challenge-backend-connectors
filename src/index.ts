@@ -1,8 +1,7 @@
 import dotenv from "dotenv";
 import App from "./app";
 import { initCacheData } from "./cacheData";
-import UserRoute from "./routes/userRoute";
-import TransactionRoute from "./routes/transactionRoute";
+import HistoryRoute from "./routes/userRoute";
 
 // Init with .env file
 dotenv.config();
@@ -14,8 +13,7 @@ const port = process.env.SERVER_PORT;
 
 const app = new App(
     [
-      new UserRoute("/user"),
-      new TransactionRoute("/transaction")
+      new HistoryRoute("/history"),
     ],
     Number(port),
   );
