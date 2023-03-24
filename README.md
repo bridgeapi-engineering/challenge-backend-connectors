@@ -1,6 +1,28 @@
-# Bankin Bank API Mock
+# Bridge challenge backend connectors
 
-This is an API used for technical tests
+This client must retrieve and aggregate accounts and transactions data as described below :
+
+```json
+[
+  {
+    "acc_number": "0000001",
+    "amount": 50,
+    "transactions": [
+      {
+        "id": 1,
+        "label": "Label 1",
+        "sign": "CDT",
+        "amount": 50,
+        "currency": "EUR"
+      },
+      ...
+    ]
+  },
+  ...
+]
+```
+
+---
 
 ## Installing
 
@@ -9,137 +31,54 @@ npm install
 npm start
 ```
 
-The local server run on port 3000
+---
 
+## Swagger
 
-## Infos
+Here is the server swagger : https://dsague.fr/swaggerui/
 
-| Credentials       | Value  |
-| ------------- | :-----|
-| **login**      |  BankinUser |
-| **password**      |  12345678 |
-| **clientId** | BankinClientId |
-| **clientSecret** | secret |
-
+---
 
 ## Endpoints
 
-- [Login](#Login)
-- [Token](#Token)
+- [Health](#Health)
 - [Accounts](#Accounts)
 - [Transactions](#Transactions)
 
-
 ---
 
-## Login
+## Health
 
-Used to get a Refresh Token for a registered User.
+Get API health.
 
-**URL** : `/login`
+**URL** : `https://dsague.fr/health`
 
-**Method** : `POST`
-
-**Auth required** : Authorization Basic credentials is composed of APP client_id and client_secret base 64 encoded
-
-**Headers** : `Content-Type: application/json`
-
-**Data constraints**
-
-```json
-{
-    "user": "[valid login]",
-    "password": "[password in plain text]"
-}
-```
+**Method** : `GET`
 
 #### Success Response
 
-A token you need to refresh in order to get a working access token.
-
 **Code** : `200 OK`
 
-**Content example**
+**Content**
 
-```json
-{
-    "refresh_token": "93144b288eb1fdccbe46d6fc0f241a51766ecd3d"
-}
 ```
-
-#### Error Response
-
-
-**Condition** : Something get wrong with the request.
-
-**Code** : `400 BAD REQUEST`
-
-**Condition** : If 'login' and 'password' combination is wrong.
-
-**Code** : `401 UNAUTHORIZED`
-
+ok
+```
 
 ---
-
-
-## Token
-
-Used to get an Access Token from a Refresh Token.
-
-**URL** : `/token`
-
-**Method** : `POST`
-
-**Auth required** : No
-
-**Headers** : `Content-Type: application/x-www-form-urlencoded`
-
-**Data constraints**
-
-```
-grant_type=refresh_token&refresh_token=<YOUR REFRESH TOKEN>
-```
-
-#### Success Response
-
-A token to access accounts endpoints.
-
-**Code** : `200 OK`
-
-**Content example**
-
-```json
-{
-    "access_token": "93144b288eb1fdccbe46d6fc0f241a51766ecd3d"
-}
-```
-
-#### Error Response
-
-
-**Condition** : Something get wrong with the request.
-
-**Code** : `400 BAD REQUEST`
-
-**Condition** : If your refresh token is wrong.
-
-**Code** : `401 UNAUTHORIZED`
-
-
----
-
 
 ## Accounts
 
 Get all user's accounts.
 
-**URL** : `/accounts`
+**URL** : `https://dsague.fr/accounts`
 
 **Method** : `GET`
 
-**Auth required** : Authorization header with Bearer token
+**Headers** :
 
-**Headers** : `Content-Type: application/json`
+- `Content-Type: application/json`
+- `x-api-key: {key provided}`
 
 #### Success Response
 
@@ -149,14 +88,17 @@ Get all user's accounts.
 
 ```json
 {
-    "account": [
-        {
-            "acc_number": "000000001",
-            "amount": "3000",
-            "currency": "EUR"
-        }
-    ],
-    "link": null
+  "accounts": [
+    {
+      "acc_number": "000000001",
+      "amount": "3000",
+      "currency": "EUR"
+    }
+  ],
+  "links": {
+    "self": "/accounts?page=1",
+    "next": "/accounts?page=2"
+  }
 }
 ```
 
@@ -168,18 +110,18 @@ Get all user's accounts.
 
 ---
 
-
 ## Transactions
 
 Get an account's transactions, by account number
 
-**URL** : `/accounts/<acc_number>/transactions`
+**URL** : `https://dsague.fr/accounts/<acc_number>/transactions`
 
 **Method** : `GET`
 
-**Auth required** : Bearer token
+**Headers** :
 
-**Headers** : `Content-Type: application/json`
+- `Content-Type: application/json`
+- `x-api-key: {key provided}`
 
 #### Success Response
 
@@ -189,30 +131,31 @@ Get an account's transactions, by account number
 
 ```json
 {
-    "transactions": [
-        {
-            "id": 1,
-            "label": "label 1",
-            "sign": "DBT",
-            "amount": "30",
-            "currency": "EUR"
-        }
-    ],
-    "link": null
+  "transactions": [
+    {
+      "id": 1,
+      "label": "label 1",
+      "sign": "DBT",
+      "amount": "30",
+      "currency": "EUR"
+    }
+  ],
+  "links": {
+    "self": "/accounts/0000001/transactions?page=1",
+    "next": "/accounts/0000001/transactions?page=2"
+  }
 }
 ```
 
-
 _Sign references_
 
-| Sign label       | Meaning  |
-| ------------- | -----|
-| DBT      |  Debit transaction |
-| CDT      |  Credit transaction |
-
+| Sign label | Meaning            |
+| ---------- | ------------------ |
+| DBT        | Debit transaction  |
+| CDT        | Credit transaction |
 
 #### Error Response
 
-**Condition** : If access token is wrong.
+**Condition** : If key api is wrong.
 
 **Code** : `401 UNAUTHORIZED`
