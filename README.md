@@ -1,12 +1,12 @@
 # Bridge challenge backend connectors
 
-This client must retrieve and aggregate accounts and transactions data as described below :
+This application must retrieve and aggregate accounts and transactions data as described below :
 
 ```json
 [
   {
     "acc_number": "0000001",
-    "amount": 50,
+    "amount": 25,
     "transactions": [
       {
         "id": 1,
@@ -15,16 +15,26 @@ This client must retrieve and aggregate accounts and transactions data as descri
         "amount": 50,
         "currency": "EUR"
       },
-      ...
+      {
+        "id": 2,
+        "label": "Label 2",
+        "sign": "DBT",
+        "amount": 25,
+        "currency": "EUR"
+      }
     ]
   },
-  ...
+  {
+    "acc_number": "0000002",
+    "amount": 50,
+    "transactions": []
+  }
 ]
 ```
 
 ---
 
-## Installing
+## Installing & starting
 
 ```
 npm install
@@ -36,6 +46,8 @@ npm start
 ## Swagger
 
 Here is the server swagger : https://dsague.fr/swaggerui/
+
+This server will simulate a bank API.
 
 ---
 
@@ -78,7 +90,7 @@ Get all user's accounts.
 **Headers** :
 
 - `Content-Type: application/json`
-- `x-api-key: {key provided}`
+- `x-api-key: {api-key}`
 
 #### Success Response
 
@@ -104,7 +116,7 @@ Get all user's accounts.
 
 #### Error Response
 
-**Condition** : If access token is wrong.
+**Condition** : If API key is missing or wrong.
 
 **Code** : `401 UNAUTHORIZED`
 
@@ -121,7 +133,7 @@ Get an account's transactions, by account number
 **Headers** :
 
 - `Content-Type: application/json`
-- `x-api-key: {key provided}`
+- `x-api-key: {api-key}`
 
 #### Success Response
 
@@ -156,6 +168,6 @@ _Sign references_
 
 #### Error Response
 
-**Condition** : If key api is wrong.
+**Condition** : If API key is missing or wrong.
 
 **Code** : `401 UNAUTHORIZED`
