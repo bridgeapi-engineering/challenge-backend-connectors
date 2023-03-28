@@ -38,7 +38,34 @@ This application must retrieve and aggregate accounts and transactions data as d
 
 ```
 npm install
+```
+
+---
+
+## Building
+
+```
+npm run build
+```
+
+Or you can use :
+
+```
+npm run watch
+```
+
+---
+
+## Starting
+
+```
 npm start
+```
+
+## Tests
+
+```
+npm run test
 ```
 
 ---
