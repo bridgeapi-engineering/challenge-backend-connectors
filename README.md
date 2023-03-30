@@ -9,17 +9,13 @@ This application must retrieve and aggregate accounts and transactions data as d
     "amount": 25,
     "transactions": [
       {
-        "id": 1,
         "label": "Label 1",
-        "sign": "CDT",
         "amount": 50,
         "currency": "EUR"
       },
       {
-        "id": 2,
         "label": "Label 2",
-        "sign": "DBT",
-        "amount": 25,
+        "amount": -25,
         "currency": "EUR"
       }
     ]
