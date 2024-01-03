@@ -1,5 +1,5 @@
 {
-  "name": "bridge_technical_test",
+  "name": "@bridgeapi/technical-connectors-test",
   "version": "1.0.0",
   "description": "Bridge technical test",
   "main": "dist/index.js",
